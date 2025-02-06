@@ -1,0 +1,411 @@
+id: a3daad39-34d1-42de-8161-4fa13f36af51
+version: 17
+vcShouldKeepItemLegacyProdMachine: false
+name: TEST - Malicious File Action
+starttaskid: "0"
+tasks:
+  "0":
+    id: "0"
+    taskid: 2b1eaa00-bc83-4730-8f67-429aad5d8e91
+    type: start
+    task:
+      id: 2b1eaa00-bc83-4730-8f67-429aad5d8e91
+      version: -1
+      name: ""
+      iscommand: false
+      brand: ""
+    nexttasks:
+      '#none#':
+      - "5"
+    separatecontext: false
+    continueonerrortype: ""
+    view: |-
+      {
+        "position": {
+          "x": 265,
+          "y": 65
+        }
+      }
+    note: false
+    timertriggers: []
+    ignoreworker: false
+    skipunavailable: false
+    quietmode: 0
+    isoversize: false
+    isautoswitchedtoquietmode: false
+  "1":
+    id: "1"
+    taskid: 04250cf9-471d-4143-8197-d36fda6e3be3
+    type: playbook
+    task:
+      id: 04250cf9-471d-4143-8197-d36fda6e3be3
+      version: -1
+      name: CORE - Add Alert Summary
+      playbookName: CORE - Add Alert Summary
+      type: playbook
+      iscommand: false
+      brand: ""
+    nexttasks:
+      '#none#':
+      - "10"
+    scriptarguments:
+      Remediation:
+        simple: First confirm the file is malicious by checking the overall prevelance
+          in our environment and the threat verdict from other sources. If confirmed
+          not prevelant and malicious, remove the malicious file ${alert.initiatorsha256}
+      Summary:
+        simple: ${alert.details}
+    separatecontext: false
+    continueonerrortype: ""
+    loop:
+      iscommand: false
+      exitCondition: ""
+      wait: 1
+      max: 100
+    view: |-
+      {
+        "position": {
+          "x": 265,
+          "y": 435
+        }
+      }
+    note: false
+    timertriggers: []
+    ignoreworker: false
+    skipunavailable: false
+    quietmode: 0
+    isoversize: false
+    isautoswitchedtoquietmode: false
+  "2":
+    id: "2"
+    taskid: 07eab8d9-eae9-4a84-8f74-8ef47df30546
+    type: regular
+    task:
+      id: 07eab8d9-eae9-4a84-8f74-8ef47df30546
+      version: -1
+      name: Check Prevelance
+      description: Get the prevalence of a file, identified by sha256.
+      script: '|||core-get-hash-analytics-prevalence'
+      type: regular
+      iscommand: true
+      brand: ""
+    nexttasks:
+      '#none#':
+      - "3"
+    scriptarguments:
+      sha256:
+        simple: ${alert.initiatorsha256}
+    separatecontext: false
+    continueonerrortype: ""
+    view: |-
+      {
+        "position": {
+          "x": 480,
+          "y": 925
+        }
+      }
+    note: false
+    timertriggers: []
+    ignoreworker: false
+    skipunavailable: false
+    quietmode: 0
+    isoversize: false
+    isautoswitchedtoquietmode: false
+  "3":
+    id: "3"
+    taskid: 004a43a4-ff06-45ae-89be-21428d19756a
+    type: regular
+    task:
+      id: 004a43a4-ff06-45ae-89be-21428d19756a
+      version: -1
+      name: Manual Review
+      type: regular
+      iscommand: false
+      brand: ""
+    nexttasks:
+      '#none#':
+      - "9"
+    separatecontext: false
+    continueonerrortype: ""
+    view: |-
+      {
+        "position": {
+          "x": 480,
+          "y": 1100
+        }
+      }
+    note: false
+    timertriggers: []
+    ignoreworker: false
+    skipunavailable: false
+    quietmode: 0
+    isoversize: false
+    isautoswitchedtoquietmode: false
+  "4":
+    id: "4"
+    taskid: a3730f78-0eb4-47e5-86d0-c2394f276f77
+    type: playbook
+    task:
+      id: a3730f78-0eb4-47e5-86d0-c2394f276f77
+      version: -1
+      name: CORE - Dedup
+      playbookName: Foundation - Dedup
+      type: playbook
+      iscommand: false
+      brand: ""
+    nexttasks:
+      '#none#':
+      - "6"
+    separatecontext: true
+    continueonerrortype: ""
+    loop:
+      iscommand: false
+      exitCondition: ""
+      wait: 1
+      max: 100
+    view: |-
+      {
+        "position": {
+          "x": 1230,
+          "y": 65
+        }
+      }
+    note: false
+    timertriggers: []
+    ignoreworker: false
+    skipunavailable: false
+    quietmode: 0
+    isoversize: false
+    isautoswitchedtoquietmode: false
+  "5":
+    id: "5"
+    taskid: b37878d3-0de6-45d9-833c-d4a41dab3b58
+    type: playbook
+    task:
+      id: b37878d3-0de6-45d9-833c-d4a41dab3b58
+      version: -1
+      name: CORE - Create ServiceNow Ticket for XSIAM Incident from Alert
+      playbookName: CORE - Create ServiceNow Ticket for XSIAM Incident from Alert
+      type: playbook
+      iscommand: false
+      brand: ""
+    nexttasks:
+      '#none#':
+      - "1"
+    separatecontext: true
+    continueonerrortype: ""
+    view: |-
+      {
+        "position": {
+          "x": 265,
+          "y": 290
+        }
+      }
+    note: false
+    timertriggers: []
+    ignoreworker: false
+    skipunavailable: false
+    quietmode: 0
+    isoversize: false
+    isautoswitchedtoquietmode: false
+  "6":
+    id: "6"
+    taskid: 8ba0d454-cce7-4f3f-860b-7d508bc67c62
+    type: condition
+    task:
+      id: 8ba0d454-cce7-4f3f-860b-7d508bc67c62
+      version: -1
+      name: Is there already a ticket open?
+      type: condition
+      iscommand: false
+      brand: ""
+    separatecontext: false
+    conditions:
+    - label: "yes"
+      condition:
+      - - operator: isExists
+          left:
+            value:
+              simple: ${parentIncidentContext.SNOW}
+            iscontext: true
+          right:
+            value: {}
+      - - operator: isEqualNumber
+          left:
+            value:
+              simple: parentIncidentFields.alert_count
+            iscontext: true
+          right:
+            value:
+              simple: "1"
+    continueonerrortype: ""
+    view: |-
+      {
+        "position": {
+          "x": 1230,
+          "y": 270
+        }
+      }
+    note: false
+    timertriggers: []
+    ignoreworker: false
+    skipunavailable: false
+    quietmode: 0
+    isoversize: false
+    isautoswitchedtoquietmode: false
+  "7":
+    id: "7"
+    taskid: 571862a2-b500-49c2-80b8-c6d6f1e25b10
+    type: condition
+    task:
+      id: 571862a2-b500-49c2-80b8-c6d6f1e25b10
+      version: -1
+      name: Close Alert
+      type: condition
+      iscommand: false
+      brand: ""
+    nexttasks:
+      '#default#':
+      - "2"
+      "yes":
+      - "8"
+    separatecontext: false
+    conditions:
+    - label: "yes"
+      condition:
+      - - operator: isEqualString
+          left:
+            value:
+              simple: Closure
+            iscontext: true
+          right:
+            value:
+              simple: "Yes"
+    continueonerrortype: ""
+    view: |-
+      {
+        "position": {
+          "x": 265,
+          "y": 750
+        }
+      }
+    note: false
+    timertriggers: []
+    ignoreworker: false
+    skipunavailable: false
+    quietmode: 0
+    isoversize: false
+    isautoswitchedtoquietmode: false
+  "8":
+    id: "8"
+    taskid: cfd80258-4a3f-4067-8596-1e76c8e77234
+    type: regular
+    task:
+      id: cfd80258-4a3f-4067-8596-1e76c8e77234
+      version: -1
+      name: Close Investigation
+      description: commands.local.cmd.close.inv
+      script: Builtin|||closeInvestigation
+      type: regular
+      iscommand: true
+      brand: Builtin
+    nexttasks:
+      '#none#':
+      - "9"
+    separatecontext: false
+    continueonerrortype: ""
+    view: |-
+      {
+        "position": {
+          "x": 50,
+          "y": 1100
+        }
+      }
+    note: false
+    timertriggers: []
+    ignoreworker: false
+    skipunavailable: false
+    quietmode: 0
+    isoversize: false
+    isautoswitchedtoquietmode: false
+  "9":
+    id: "9"
+    taskid: c62a1d71-99d6-4eb6-8204-d000749cd702
+    type: title
+    task:
+      id: c62a1d71-99d6-4eb6-8204-d000749cd702
+      version: -1
+      name: Fin
+      type: title
+      iscommand: false
+      brand: ""
+    separatecontext: false
+    continueonerrortype: ""
+    view: |-
+      {
+        "position": {
+          "x": 265,
+          "y": 1275
+        }
+      }
+    note: false
+    timertriggers: []
+    ignoreworker: false
+    skipunavailable: false
+    quietmode: 0
+    isoversize: false
+    isautoswitchedtoquietmode: false
+  "10":
+    id: "10"
+    taskid: b67b6a96-1439-47e4-894f-ac4ffa9d16b3
+    type: regular
+    task:
+      id: b67b6a96-1439-47e4-894f-ac4ffa9d16b3
+      version: -1
+      name: Update SNOW Incident Work Notes with Alert Details
+      description: Updates the specified ticket.
+      script: '|||servicenow-update-ticket'
+      type: regular
+      iscommand: true
+      brand: ""
+    nexttasks:
+      '#none#':
+      - "7"
+    scriptarguments:
+      id:
+        simple: ${parentIncidentContext.SNOW}
+      work_notes:
+        simple: |-
+          ${alert.id} - ${alert.name}
+
+          ${alert.details}
+    separatecontext: false
+    continueonerrortype: ""
+    view: |-
+      {
+        "position": {
+          "x": 265,
+          "y": 590
+        }
+      }
+    note: false
+    timertriggers: []
+    ignoreworker: false
+    skipunavailable: false
+    quietmode: 0
+    isoversize: false
+    isautoswitchedtoquietmode: false
+view: |-
+  {
+    "linkLabelsPosition": {},
+    "paper": {
+      "dimensions": {
+        "height": 1275,
+        "width": 1560,
+        "x": 50,
+        "y": 65
+      }
+    }
+  }
+inputs: []
+outputs: []

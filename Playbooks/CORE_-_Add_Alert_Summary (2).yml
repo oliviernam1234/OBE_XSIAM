@@ -1,0 +1,412 @@
+id: c92319ed-d5f4-4a1a-8f44-d0376495d946
+version: 33
+vcShouldKeepItemLegacyProdMachine: false
+name: CORE - Add Alert Summary
+starttaskid: "0"
+tasks:
+  "0":
+    id: "0"
+    taskid: d6062d78-571b-40ed-8e15-c688a80cea22
+    type: start
+    task:
+      id: d6062d78-571b-40ed-8e15-c688a80cea22
+      version: -1
+      name: ""
+      iscommand: false
+      brand: ""
+    nexttasks:
+      '#none#':
+      - "3"
+    separatecontext: false
+    continueonerrortype: ""
+    view: |-
+      {
+        "position": {
+          "x": 450,
+          "y": -410
+        }
+      }
+    note: false
+    timertriggers: []
+    ignoreworker: false
+    skipunavailable: false
+    quietmode: 0
+    isoversize: false
+    isautoswitchedtoquietmode: false
+  "1":
+    id: "1"
+    taskid: d29f2e40-44b4-4835-88b7-ef5283fc1acf
+    type: regular
+    task:
+      id: d29f2e40-44b4-4835-88b7-ef5283fc1acf
+      version: -1
+      name: Send Markdown to Parent Incident War room
+      description: send HTTP POST request.
+      script: Core REST API|||core-api-post
+      type: regular
+      iscommand: true
+      brand: Core REST API
+    scriptarguments:
+      body:
+        simple: '{"id":"","version":0,"investigationId":"INCIDENT-${parentIncidentFields.incident_id}","markdown":true,"data":"${alert.markdownsummary}"}'
+      uri:
+        simple: /xsoar/entry
+    separatecontext: false
+    continueonerrortype: ""
+    view: |-
+      {
+        "position": {
+          "x": -560,
+          "y": 515
+        }
+      }
+    note: false
+    timertriggers: []
+    ignoreworker: false
+    skipunavailable: false
+    quietmode: 0
+    isoversize: false
+    isautoswitchedtoquietmode: false
+  "2":
+    id: "2"
+    taskid: ff27f878-3df9-461b-8d80-f797e9171682
+    type: regular
+    task:
+      id: ff27f878-3df9-461b-8d80-f797e9171682
+      version: -1
+      name: Set Alert Markdown Summary
+      description: commands.local.cmd.set.incident
+      script: Builtin|||setAlert
+      type: regular
+      iscommand: true
+      brand: Builtin
+    nexttasks:
+      '#none#':
+      - "5"
+    scriptarguments:
+      markdownsummary:
+        simple: |-
+          ## Summary - ID ${alert.id}
+          ${inputs.Summary}
+
+          ## Remediation Suggestion
+          ${inputs.Remediation}
+    separatecontext: false
+    continueonerrortype: ""
+    view: |-
+      {
+        "position": {
+          "x": 450,
+          "y": -30
+        }
+      }
+    note: false
+    timertriggers: []
+    ignoreworker: false
+    skipunavailable: false
+    quietmode: 0
+    isoversize: false
+    isautoswitchedtoquietmode: false
+  "3":
+    id: "3"
+    taskid: 77543d2a-be1c-4109-8afd-efa888ad8434
+    type: regular
+    task:
+      id: 77543d2a-be1c-4109-8afd-efa888ad8434
+      version: -1
+      name: Set Remediation Suggestion
+      description: commands.local.cmd.set.incident
+      script: Builtin|||setAlert
+      type: regular
+      iscommand: true
+      brand: Builtin
+    nexttasks:
+      '#none#':
+      - "2"
+    scriptarguments:
+      remediationsuggestion:
+        simple: ${inputs.Remediation}
+    separatecontext: false
+    continueonerrortype: ""
+    view: |-
+      {
+        "position": {
+          "x": 450,
+          "y": -240
+        }
+      }
+    note: false
+    timertriggers: []
+    ignoreworker: false
+    skipunavailable: false
+    quietmode: 0
+    isoversize: false
+    isautoswitchedtoquietmode: false
+  "4":
+    id: "4"
+    taskid: 5de851dc-29ca-4e06-882c-9cf0726ae7a4
+    type: regular
+    task:
+      id: 5de851dc-29ca-4e06-882c-9cf0726ae7a4
+      version: -1
+      name: Set Remediation to Parent Incident Context
+      description: commands.local.cmd.set.parent.incident.context
+      script: Builtin|||setParentIncidentContext
+      type: regular
+      iscommand: true
+      brand: Builtin
+    nexttasks:
+      '#none#':
+      - "9"
+    scriptarguments:
+      key:
+        simple: RemediationActions
+      value:
+        simple: ${inputs.Remediation}
+    separatecontext: false
+    continueonerrortype: ""
+    view: |-
+      {
+        "position": {
+          "x": 450,
+          "y": 390
+        }
+      }
+    note: false
+    timertriggers: []
+    ignoreworker: false
+    skipunavailable: false
+    quietmode: 0
+    isoversize: false
+    isautoswitchedtoquietmode: false
+  "5":
+    id: "5"
+    taskid: 4ca3d800-8d10-4428-89bc-f41c778c91b9
+    type: condition
+    task:
+      id: 4ca3d800-8d10-4428-89bc-f41c778c91b9
+      version: -1
+      name: Is remediation action already marked?
+      type: condition
+      iscommand: false
+      brand: ""
+    nexttasks:
+      '#default#':
+      - "4"
+      "yes":
+      - "8"
+    separatecontext: false
+    conditions:
+    - label: "yes"
+      condition:
+      - - operator: isExists
+          left:
+            value:
+              simple: parentIncidentContext.RemediationActions
+            iscontext: true
+      - - operator: containsGeneral
+          left:
+            value:
+              simple: parentIncidentContext.RemediationActions
+            iscontext: true
+          right:
+            value:
+              simple: ${inputs.Remediation}
+    continueonerrortype: ""
+    view: |-
+      {
+        "position": {
+          "x": 450,
+          "y": 160
+        }
+      }
+    note: false
+    timertriggers: []
+    ignoreworker: false
+    skipunavailable: false
+    quietmode: 0
+    isoversize: false
+    isautoswitchedtoquietmode: false
+  "6":
+    id: "6"
+    taskid: ea07541f-89cc-45bb-8c9e-b843190e0e8f
+    type: title
+    task:
+      id: ea07541f-89cc-45bb-8c9e-b843190e0e8f
+      version: -1
+      name: FIN
+      type: title
+      iscommand: false
+      brand: ""
+    separatecontext: false
+    continueonerrortype: ""
+    view: |-
+      {
+        "position": {
+          "x": 600,
+          "y": 800
+        }
+      }
+    note: false
+    timertriggers: []
+    ignoreworker: false
+    skipunavailable: false
+    quietmode: 0
+    isoversize: false
+    isautoswitchedtoquietmode: false
+  "7":
+    id: "7"
+    taskid: 45df1962-da94-470e-8472-25fd6ab40380
+    type: regular
+    task:
+      id: 45df1962-da94-470e-8472-25fd6ab40380
+      version: -1
+      name: Add Parent Warroom Entry
+      description: Prints a value to the parent incident's war-room of the current
+        alert.
+      scriptName: PrintToParentIncident
+      type: regular
+      iscommand: false
+      brand: ""
+    scriptarguments:
+      retry-count:
+        simple: "6"
+      retry-interval:
+        simple: "10"
+      value:
+        simple: ${alert.markdownsummary}
+    separatecontext: false
+    continueonerrortype: ""
+    view: |-
+      {
+        "position": {
+          "x": -130,
+          "y": 410
+        }
+      }
+    note: false
+    timertriggers: []
+    ignoreworker: false
+    skipunavailable: false
+    quietmode: 0
+    isoversize: false
+    isautoswitchedtoquietmode: false
+  "8":
+    id: "8"
+    taskid: 8751ca0a-f7a6-4d9d-8ff1-453a8dcd261d
+    type: regular
+    task:
+      id: 8751ca0a-f7a6-4d9d-8ff1-453a8dcd261d
+      version: -1
+      name: Set Alert for closure
+      description: Set a value in context under the key you entered.
+      scriptName: Set
+      type: regular
+      iscommand: false
+      brand: Builtin
+    nexttasks:
+      '#none#':
+      - "6"
+    scriptarguments:
+      key:
+        simple: Closure
+      value:
+        simple: "Yes"
+    separatecontext: false
+    continueonerrortype: ""
+    view: |-
+      {
+        "position": {
+          "x": 920,
+          "y": 370
+        }
+      }
+    note: false
+    timertriggers: []
+    ignoreworker: false
+    skipunavailable: false
+    quietmode: 0
+    isoversize: false
+    isautoswitchedtoquietmode: false
+  "9":
+    id: "9"
+    taskid: f9aa5f6d-df03-4c51-8459-e79187555efa
+    type: regular
+    task:
+      id: f9aa5f6d-df03-4c51-8459-e79187555efa
+      version: -1
+      name: Set Parent incident remediation steps
+      description: commands.local.cmd.set.parent.incident.field
+      script: Builtin|||setParentIncidentFields
+      type: regular
+      iscommand: true
+      brand: Builtin
+    nexttasks:
+      '#none#':
+      - "6"
+    scriptarguments:
+      anaylstresponsesteps:
+        complex:
+          root: parentIncidentContext
+          accessor: RemediationActions
+          transformers:
+          - operator: join
+            args:
+              separator:
+                value:
+                  simple: |2+
+
+
+    separatecontext: false
+    continueonerrortype: ""
+    view: |-
+      {
+        "position": {
+          "x": 450,
+          "y": 550
+        }
+      }
+    note: false
+    timertriggers: []
+    ignoreworker: false
+    skipunavailable: false
+    quietmode: 0
+    isoversize: false
+    isautoswitchedtoquietmode: false
+view: |-
+  {
+    "linkLabelsPosition": {},
+    "paper": {
+      "dimensions": {
+        "height": 1275,
+        "width": 1860,
+        "x": -560,
+        "y": -410
+      }
+    }
+  }
+inputs:
+- key: Remediation
+  value: {}
+  required: false
+  description: The remediation suggestion for this alert overall
+  playbookInputQuery: null
+- key: Summary
+  value:
+    simple: ${alert.details}
+  required: false
+  description: The summary information for the alert
+  playbookInputQuery: null
+inputSections:
+- inputs:
+  - Remediation
+  - Summary
+  name: General (Inputs group)
+  description: Generic group for inputs
+outputSections:
+- outputs: []
+  name: General (Outputs group)
+  description: Generic group for outputs
+outputs: []
+quiet: true
+dirtyInputs: true

@@ -1,0 +1,357 @@
+id: 2f91ceda-1b18-4794-87d6-257d31c184eb
+version: 11
+vcShouldKeepItemLegacyProdMachine: false
+name: CORE - Create ServiceNow Ticket for XSIAM Incident from Alert
+starttaskid: "0"
+tasks:
+  "0":
+    id: "0"
+    taskid: 8e8e1de0-8e93-4612-8ccf-0bbbeba7dd0b
+    type: start
+    task:
+      id: 8e8e1de0-8e93-4612-8ccf-0bbbeba7dd0b
+      version: -1
+      name: ""
+      iscommand: false
+      brand: ""
+    nexttasks:
+      '#none#':
+      - "6"
+    separatecontext: false
+    continueonerrortype: ""
+    view: |-
+      {
+        "position": {
+          "x": 50,
+          "y": -330
+        }
+      }
+    note: false
+    timertriggers: []
+    ignoreworker: false
+    skipunavailable: false
+    quietmode: 0
+    isoversize: false
+    isautoswitchedtoquietmode: false
+  "1":
+    id: "1"
+    taskid: 9ce147b4-4148-4444-885b-7a5708801bb6
+    type: condition
+    task:
+      id: 9ce147b4-4148-4444-885b-7a5708801bb6
+      version: -1
+      name: Is there already a ticket open?
+      type: condition
+      iscommand: false
+      brand: ""
+    separatecontext: false
+    conditions:
+    - label: "yes"
+      condition:
+      - - operator: isExists
+          left:
+            value:
+              simple: ${parentIncidentContext.SNOW}
+            iscontext: true
+    continueonerrortype: ""
+    view: |-
+      {
+        "position": {
+          "x": 850,
+          "y": 260
+        }
+      }
+    note: false
+    timertriggers: []
+    ignoreworker: false
+    skipunavailable: false
+    quietmode: 0
+    isoversize: false
+    isautoswitchedtoquietmode: false
+  "2":
+    id: "2"
+    taskid: b088f07e-f1f9-4a88-8a09-b147bf316cb7
+    type: title
+    task:
+      id: b088f07e-f1f9-4a88-8a09-b147bf316cb7
+      version: -1
+      name: FIN
+      type: title
+      iscommand: false
+      brand: ""
+    separatecontext: false
+    continueonerrortype: ""
+    view: |-
+      {
+        "position": {
+          "x": 50,
+          "y": 895
+        }
+      }
+    note: false
+    timertriggers: []
+    ignoreworker: false
+    skipunavailable: false
+    quietmode: 0
+    isoversize: false
+    isautoswitchedtoquietmode: false
+  "3":
+    id: "3"
+    taskid: b01e912c-d7a6-41ed-883f-26b523e6eb3a
+    type: regular
+    task:
+      id: b01e912c-d7a6-41ed-883f-26b523e6eb3a
+      version: -1
+      name: Open SNOW ticket
+      description: Creates new ServiceNow ticket.
+      script: '|||servicenow-create-ticket'
+      type: regular
+      iscommand: true
+      brand: ""
+    nexttasks:
+      '#none#':
+      - "5"
+    scriptarguments:
+      custom_fields:
+        simple: u_xsiam_inc_id=${parentIncidentFields.incident_id}
+      description:
+        simple: ${parentIncidentFields.description}
+      short_description:
+        simple: Cortex XSIAM - INC ${parentIncidentFields.incident_id}
+    separatecontext: false
+    continueonerrortype: ""
+    view: |-
+      {
+        "position": {
+          "x": 50,
+          "y": 250
+        }
+      }
+    note: false
+    timertriggers: []
+    ignoreworker: false
+    skipunavailable: false
+    quietmode: 0
+    isoversize: false
+    isautoswitchedtoquietmode: false
+  "4":
+    id: "4"
+    taskid: 5aa76d5a-60d9-4d11-835e-7c3f640ecee7
+    type: regular
+    task:
+      id: 5aa76d5a-60d9-4d11-835e-7c3f640ecee7
+      version: -1
+      name: Update SNOW Incident Work Notes with Alert Details
+      description: Updates the specified ticket.
+      script: '|||servicenow-update-ticket'
+      type: regular
+      iscommand: true
+      brand: ""
+    scriptarguments:
+      id:
+        simple: ${parentIncidentContext.SNOW}
+      work_notes:
+        simple: |-
+          ${alert.id} - ${alert.name}
+
+          ${alert.details}
+    separatecontext: false
+    continueonerrortype: ""
+    view: |-
+      {
+        "position": {
+          "x": 850,
+          "y": 640
+        }
+      }
+    note: false
+    timertriggers: []
+    ignoreworker: false
+    skipunavailable: false
+    quietmode: 0
+    isoversize: false
+    isautoswitchedtoquietmode: false
+  "5":
+    id: "5"
+    taskid: 3069e554-f442-4f8d-84c4-e1fc7ae4c823
+    type: regular
+    task:
+      id: 3069e554-f442-4f8d-84c4-e1fc7ae4c823
+      version: -1
+      name: Set Incident Context
+      description: commands.local.cmd.set.parent.incident.context
+      script: Builtin|||setParentIncidentContext
+      type: regular
+      iscommand: true
+      brand: Builtin
+    nexttasks:
+      '#none#':
+      - "8"
+    scriptarguments:
+      key:
+        simple: SNOW
+      value:
+        simple: ${ServiceNow.Ticket.ID}
+    separatecontext: false
+    continueonerrortype: ""
+    view: |-
+      {
+        "position": {
+          "x": 50,
+          "y": 435
+        }
+      }
+    note: false
+    timertriggers: []
+    ignoreworker: false
+    skipunavailable: false
+    quietmode: 0
+    isoversize: false
+    isautoswitchedtoquietmode: false
+  "6":
+    id: "6"
+    taskid: 6b10ce18-5678-45e3-8c1f-8769472d1405
+    type: regular
+    task:
+      id: 6b10ce18-5678-45e3-8c1f-8769472d1405
+      version: -1
+      name: Get Alerts
+      description: send HTTP POST request.
+      script: '|||core-api-post'
+      type: regular
+      iscommand: true
+      brand: ""
+    nexttasks:
+      '#none#':
+      - "7"
+    scriptarguments:
+      body:
+        simple: '{ "request_data": {"incident_id": "${parentIncidentFields.incident_id}",
+          "alerts_limit": 5}}'
+      extend-context:
+        simple: Alerts=.
+      uri:
+        simple: /public_api/v1/incidents/get_incident_extra_data
+    separatecontext: false
+    continueonerrortype: ""
+    view: |-
+      {
+        "position": {
+          "x": 50,
+          "y": -175
+        }
+      }
+    note: false
+    timertriggers: []
+    ignoreworker: false
+    skipunavailable: false
+    quietmode: 0
+    isoversize: false
+    isautoswitchedtoquietmode: false
+  "7":
+    id: "7"
+    taskid: b8af74dd-7df0-4768-86cf-44671803c341
+    type: condition
+    task:
+      id: b8af74dd-7df0-4768-86cf-44671803c341
+      version: -1
+      name: Should a ticket be opened?
+      type: condition
+      iscommand: false
+      brand: ""
+    nexttasks:
+      '#default#':
+      - "2"
+      "yes":
+      - "3"
+    separatecontext: false
+    conditions:
+    - label: "yes"
+      condition:
+      - - operator: isEqualNumber
+          left:
+            value:
+              simple: alert.id
+            iscontext: true
+          right:
+            value:
+              complex:
+                root: Alerts.response.reply.alerts.data
+                accessor: alert_id
+                transformers:
+                - operator: sort
+                  args:
+                    descending: {}
+                - operator: atIndex
+                  args:
+                    index:
+                      value:
+                        simple: "0"
+            iscontext: true
+    continueonerrortype: ""
+    view: |-
+      {
+        "position": {
+          "x": 50,
+          "y": 0
+        }
+      }
+    note: false
+    timertriggers: []
+    ignoreworker: false
+    skipunavailable: false
+    quietmode: 0
+    isoversize: false
+    isautoswitchedtoquietmode: false
+  "8":
+    id: "8"
+    taskid: feda2e22-8394-4a51-89f6-38d1eaaea7e8
+    type: regular
+    task:
+      id: feda2e22-8394-4a51-89f6-38d1eaaea7e8
+      version: -1
+      name: SetParentIncident Fields - SNOW ID
+      description: commands.local.cmd.set.parent.incident.field
+      script: Builtin|||setParentIncidentFields
+      type: regular
+      iscommand: true
+      brand: Builtin
+    nexttasks:
+      '#none#':
+      - "2"
+    scriptarguments:
+      incident_name:
+        simple: ServiceNow:${ServiceNow.Ticket.ID}
+      servicenowticketid:
+        simple: ${ServiceNow.Ticket.ID}
+    separatecontext: false
+    continueonerrortype: ""
+    view: |-
+      {
+        "position": {
+          "x": 50,
+          "y": 590
+        }
+      }
+    note: false
+    timertriggers: []
+    ignoreworker: false
+    skipunavailable: false
+    quietmode: 0
+    isoversize: false
+    isautoswitchedtoquietmode: false
+view: |-
+  {
+    "linkLabelsPosition": {},
+    "paper": {
+      "dimensions": {
+        "height": 1290,
+        "width": 1180,
+        "x": 50,
+        "y": -330
+      }
+    }
+  }
+inputs: []
+outputs: []
+dirtyInputs: true

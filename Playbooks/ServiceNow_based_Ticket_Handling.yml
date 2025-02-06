@@ -1,0 +1,119 @@
+id: d5d500b8-979d-4c35-83c3-da7bae2d48c3
+version: 4
+vcShouldKeepItemLegacyProdMachine: false
+name: ServiceNow based Ticket Handling
+starttaskid: "0"
+tasks:
+  "0":
+    id: "0"
+    taskid: 78cc53c3-f335-4e1d-84da-7b400b2dd4d4
+    type: start
+    task:
+      id: 78cc53c3-f335-4e1d-84da-7b400b2dd4d4
+      version: -1
+      name: ""
+      iscommand: false
+      brand: ""
+    nexttasks:
+      '#none#':
+      - "1"
+    separatecontext: false
+    continueonerrortype: ""
+    view: |-
+      {
+        "position": {
+          "x": 450,
+          "y": 50
+        }
+      }
+    note: false
+    timertriggers: []
+    ignoreworker: false
+    skipunavailable: false
+    quietmode: 0
+    isoversize: false
+    isautoswitchedtoquietmode: false
+  "1":
+    id: "1"
+    taskid: c73c9ae5-afef-4957-883e-fb95cfa12551
+    type: regular
+    task:
+      id: c73c9ae5-afef-4957-883e-fb95cfa12551
+      version: -1
+      name: Set SNOW id to parent incident
+      description: commands.local.cmd.set.parent.incident.field
+      script: Builtin|||setParentIncidentFields
+      type: regular
+      iscommand: true
+      brand: Builtin
+    nexttasks:
+      '#none#':
+      - "2"
+    scriptarguments:
+      servicenowticketid:
+        simple: ${alert.servicenowticketid}
+    separatecontext: false
+    continueonerrortype: ""
+    view: |-
+      {
+        "position": {
+          "x": 450,
+          "y": 190
+        }
+      }
+    note: false
+    timertriggers: []
+    ignoreworker: false
+    skipunavailable: false
+    quietmode: 0
+    isoversize: false
+    isautoswitchedtoquietmode: false
+  "2":
+    id: "2"
+    taskid: d385f078-c28c-4904-8143-1c98ff8a11ce
+    type: regular
+    task:
+      id: d385f078-c28c-4904-8143-1c98ff8a11ce
+      version: -1
+      name: Set XSIAM Incident ID in SNOW
+      description: Updates the specified ticket.
+      script: '|||servicenow-update-ticket'
+      type: regular
+      iscommand: true
+      brand: ""
+    scriptarguments:
+      custom_fields:
+        simple: u_xsiam_inc_id=${parentIncidentFields.incident_id}
+      id:
+        simple: ${alert.servicenowticketid}
+    separatecontext: false
+    continueonerrortype: ""
+    view: |-
+      {
+        "position": {
+          "x": 450,
+          "y": 350
+        }
+      }
+    note: false
+    timertriggers: []
+    ignoreworker: false
+    skipunavailable: false
+    quietmode: 0
+    isoversize: false
+    isautoswitchedtoquietmode: false
+view: |-
+  {
+    "linkLabelsPosition": {},
+    "paper": {
+      "dimensions": {
+        "height": 395,
+        "width": 380,
+        "x": 450,
+        "y": 50
+      }
+    }
+  }
+inputs: []
+outputs: []
+quiet: true

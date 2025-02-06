@@ -1,0 +1,154 @@
+{
+	"cacheVersn": 0,
+	"close": null,
+	"definitionId": "",
+	"description": "",
+	"detached": false,
+	"details": null,
+	"detailsV2": {
+		"TypeName": "",
+		"tabs": [
+			{
+				"id": "overview",
+				"name": "Overview",
+				"type": "overview"
+			},
+			{
+				"hidden": false,
+				"id": "ddwoqsqp1w",
+				"name": "ServiceNow",
+				"sections": [
+					{
+						"displayType": "ROW",
+						"h": 5,
+						"hideItemTitleOnlyOne": true,
+						"hideName": true,
+						"i": "ddwoqsqp1w-fc55a7c8-a1ab-4eab-936b-d228548eaeb5",
+						"items": [
+							{
+								"dropEffect": "move",
+								"endCol": 4,
+								"fieldId": "servicenowticketdetails",
+								"height": 106,
+								"id": "458d9295-802f-4ecf-90fb-fa9b32368d91",
+								"index": 0,
+								"listId": "ddwoqsqp1w-fc55a7c8-a1ab-4eab-936b-d228548eaeb5",
+								"sectionItemType": "field",
+								"startCol": 0
+							}
+						],
+						"maxW": 3,
+						"minH": 1,
+						"moved": false,
+						"name": "Service Now",
+						"static": false,
+						"w": 2,
+						"x": 1,
+						"y": 0
+					},
+					{
+						"displayType": "ROW",
+						"h": 5,
+						"hideName": false,
+						"i": "ddwoqsqp1w-02882432-43a1-4bea-9496-4fdb42a347d3",
+						"items": [
+							{
+								"args": {
+									"tag": {
+										"simple": "work_notes"
+									},
+									"ticket_id": {
+										"simple": "${parentIncidentFields.custom_fields.servicenowticketid}"
+									}
+								},
+								"endCol": 2,
+								"fieldId": "",
+								"height": 44,
+								"id": "243fe832-c8b4-4c03-963c-62367f348cc8",
+								"index": 0,
+								"name": "Add Work Note",
+								"scriptId": "ServiceNowAddComment",
+								"sectionItemType": "button",
+								"startCol": 0
+							},
+							{
+								"args": {
+									"id": {
+										"simple": "${parentIncidentFields.custom_fields.servicenowticketid}"
+									},
+									"severity": {
+										"simple": "",
+										"userMarkedRequired": true
+									}
+								},
+								"endCol": 2,
+								"fieldId": "",
+								"height": 44,
+								"id": "941bde1a-9174-477a-b996-bf3edaf1af46",
+								"index": 1,
+								"name": "Update ServiceNow Ticket Severity",
+								"scriptId": "ServiceNow v2 - XSIAM Mirroring|||servicenow-update-ticket",
+								"sectionItemType": "button",
+								"startCol": 0
+							}
+						],
+						"maxW": 3,
+						"minH": 1,
+						"moved": false,
+						"name": "Actions",
+						"static": false,
+						"w": 1,
+						"x": 0,
+						"y": 0
+					}
+				],
+				"type": "custom"
+			},
+			{
+				"id": "assets_and_artifacts",
+				"name": "Key Assets \u0026 Artifacts",
+				"type": "assets_and_artifacts"
+			},
+			{
+				"id": "alerts_and_insights",
+				"name": "Alerts \u0026 Insights",
+				"type": "alerts_and_insights"
+			},
+			{
+				"id": "timeline",
+				"name": "Timeline",
+				"type": "timeline"
+			},
+			{
+				"id": "war_room",
+				"name": "Incident War Room",
+				"type": "war_room"
+			},
+			{
+				"id": "executions",
+				"name": "Executions",
+				"type": "executions"
+			}
+		]
+	},
+	"edit": null,
+	"fromServerVersion": "",
+	"group": "case",
+	"id": "95011e9b-9270-4190-8352-d1ab7b958a52",
+	"indicatorsDetails": null,
+	"indicatorsQuickView": null,
+	"itemVersion": "",
+	"locked": false,
+	"mobile": null,
+	"name": "ServiceNow Case Management",
+	"packID": "",
+	"packName": "",
+	"propagationLabels": [
+		"all"
+	],
+	"quickView": null,
+	"quickViewV2": null,
+	"system": false,
+	"toServerVersion": "",
+	"version": -1
+}

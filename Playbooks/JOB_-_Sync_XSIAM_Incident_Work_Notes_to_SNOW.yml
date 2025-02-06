@@ -1,0 +1,213 @@
+id: 3ffe9119-cf83-4b25-825b-db4c0e351e9d
+version: 13
+vcShouldKeepItemLegacyProdMachine: false
+name: JOB - Sync XSIAM Incident Work Notes to SNOW
+starttaskid: "0"
+tasks:
+  "0":
+    id: "0"
+    taskid: 499d538c-ab00-4846-8fad-58cb180d050d
+    type: start
+    task:
+      id: 499d538c-ab00-4846-8fad-58cb180d050d
+      version: -1
+      name: ""
+      iscommand: false
+      brand: ""
+    nexttasks:
+      '#none#':
+      - "1"
+    separatecontext: false
+    continueonerrortype: ""
+    view: |-
+      {
+        "position": {
+          "x": 450,
+          "y": -80
+        }
+      }
+    note: false
+    timertriggers: []
+    ignoreworker: false
+    skipunavailable: false
+    quietmode: 0
+    isoversize: false
+    isautoswitchedtoquietmode: false
+  "1":
+    id: "1"
+    taskid: 73103a5a-5211-41bc-8bd2-174cb1b0e3eb
+    type: regular
+    task:
+      id: 73103a5a-5211-41bc-8bd2-174cb1b0e3eb
+      version: -1
+      name: Get Incidents
+      description: send HTTP POST request.
+      script: '|||core-api-post'
+      type: regular
+      iscommand: true
+      brand: ""
+    nexttasks:
+      '#none#':
+      - "4"
+    scriptarguments:
+      body:
+        simple: '{"request_data" : {"filters" : [{"field": "status","operator": "eq","value":
+          "New"}]}}'
+      extend-context:
+        simple: Found=.
+      uri:
+        simple: /public_api/v1/incidents/get_incidents
+    separatecontext: false
+    continueonerror: true
+    continueonerrortype: ""
+    view: |-
+      {
+        "position": {
+          "x": 450,
+          "y": 110
+        }
+      }
+    note: false
+    timertriggers: []
+    ignoreworker: false
+    skipunavailable: false
+    quietmode: 0
+    isoversize: false
+    isautoswitchedtoquietmode: false
+  "2":
+    id: "2"
+    taskid: b874c833-9985-4f8e-8e67-c3b0cabb10b3
+    type: playbook
+    task:
+      id: b874c833-9985-4f8e-8e67-c3b0cabb10b3
+      version: -1
+      name: ServiceNow Sync XSIAM Work Notes
+      playbookName: ServiceNow Sync XSIAM Work Notes
+      type: playbook
+      iscommand: false
+      brand: ""
+    nexttasks:
+      '#none#':
+      - "3"
+    scriptarguments:
+      Incident:
+        complex:
+          root: Found.response.reply.incidents
+          filters:
+          - - operator: isExists
+              left:
+                value:
+                  simple: Found.response.reply.incidents.custom_fields.servicenowticketid
+                iscontext: true
+    separatecontext: true
+    continueonerrortype: ""
+    loop:
+      iscommand: false
+      exitCondition: ""
+      wait: 1
+      max: 100
+      forEach: true
+    view: |-
+      {
+        "position": {
+          "x": 450,
+          "y": 460
+        }
+      }
+    note: false
+    timertriggers: []
+    ignoreworker: false
+    skipunavailable: false
+    quietmode: 0
+    isoversize: false
+    isautoswitchedtoquietmode: false
+  "3":
+    id: "3"
+    taskid: 609e771d-c870-40ed-8e9d-4fc6996db208
+    type: regular
+    task:
+      id: 609e771d-c870-40ed-8e9d-4fc6996db208
+      version: -1
+      name: Close
+      description: commands.local.cmd.close.inv
+      script: Builtin|||closeInvestigation
+      type: regular
+      iscommand: true
+      brand: Builtin
+    separatecontext: false
+    continueonerrortype: ""
+    view: |-
+      {
+        "position": {
+          "x": 450,
+          "y": 670
+        }
+      }
+    note: false
+    timertriggers: []
+    ignoreworker: false
+    skipunavailable: false
+    quietmode: 0
+    isoversize: false
+    isautoswitchedtoquietmode: false
+  "4":
+    id: "4"
+    taskid: 299d6fbb-c7b5-4472-87ff-ceb718214f1e
+    type: condition
+    task:
+      id: 299d6fbb-c7b5-4472-87ff-ceb718214f1e
+      version: -1
+      name: Are there incidents with SNOW cases?
+      type: condition
+      iscommand: false
+      brand: ""
+    nexttasks:
+      '#default#':
+      - "3"
+      "yes":
+      - "2"
+    separatecontext: false
+    conditions:
+    - label: "yes"
+      condition:
+      - - operator: isExists
+          left:
+            value:
+              complex:
+                root: Found.response.reply.incidents
+                filters:
+                - - operator: isExists
+                    left:
+                      value:
+                        simple: Found.response.reply.incidents.custom_fields.servicenowticketid
+                      iscontext: true
+            iscontext: true
+    continueonerrortype: ""
+    view: |-
+      {
+        "position": {
+          "x": 450,
+          "y": 250
+        }
+      }
+    note: false
+    timertriggers: []
+    ignoreworker: false
+    skipunavailable: false
+    quietmode: 0
+    isoversize: false
+    isautoswitchedtoquietmode: false
+view: |-
+  {
+    "linkLabelsPosition": {},
+    "paper": {
+      "dimensions": {
+        "height": 845,
+        "width": 380,
+        "x": 450,
+        "y": -80
+      }
+    }
+  }
+inputs: []
+outputs: []

@@ -1,0 +1,190 @@
+id: 3bf06739-e393-4f28-823a-13f89c137722
+version: 9
+vcShouldKeepItemLegacyProdMachine: false
+name: SNOW - process xsiam warroom entries
+starttaskid: "0"
+tasks:
+  "0":
+    id: "0"
+    taskid: a25697b0-b000-4901-8e7a-c299350327cb
+    type: start
+    task:
+      id: a25697b0-b000-4901-8e7a-c299350327cb
+      version: -1
+      name: ""
+      iscommand: false
+      brand: ""
+    nexttasks:
+      '#none#':
+      - "1"
+    separatecontext: false
+    continueonerrortype: ""
+    view: |-
+      {
+        "position": {
+          "x": 650,
+          "y": 380
+        }
+      }
+    note: false
+    timertriggers: []
+    ignoreworker: false
+    skipunavailable: false
+    quietmode: 0
+    isoversize: false
+    isautoswitchedtoquietmode: false
+  "1":
+    id: "1"
+    taskid: e3966da8-cb98-4388-8673-f24c77e706d2
+    type: regular
+    task:
+      id: e3966da8-cb98-4388-8673-f24c77e706d2
+      version: -1
+      name: Update SNOW Ticket worknotes
+      description: Updates the specified ticket.
+      script: '|||servicenow-update-ticket'
+      type: regular
+      iscommand: true
+      brand: ""
+    nexttasks:
+      '#none#':
+      - "2"
+    scriptarguments:
+      id:
+        simple: ${inputs.SNOWID}
+      work_notes:
+        simple: ${inputs.entry.contents}
+    separatecontext: false
+    continueonerrortype: ""
+    view: |-
+      {
+        "position": {
+          "x": 650,
+          "y": 570
+        }
+      }
+    note: false
+    timertriggers: []
+    ignoreworker: false
+    skipunavailable: false
+    quietmode: 0
+    isoversize: false
+    isautoswitchedtoquietmode: false
+  "2":
+    id: "2"
+    taskid: 3ed06181-db2d-4c55-833c-7b729c525c92
+    type: regular
+    task:
+      id: 3ed06181-db2d-4c55-833c-7b729c525c92
+      version: -1
+      name: Update Warroom tags
+      description: send HTTP POST request.
+      script: '|||core-api-post'
+      type: regular
+      iscommand: true
+      brand: ""
+    nexttasks:
+      '#none#':
+      - "3"
+    scriptarguments:
+      body:
+        simple: '{"id":"${inputs.entry.id}","version":2,"investigationId":"${inputs.XSIAMID}","tags":["processed"]}'
+      uri:
+        simple: /xsoar/entry/tags
+    separatecontext: false
+    continueonerrortype: ""
+    view: |-
+      {
+        "position": {
+          "x": 650,
+          "y": 750
+        }
+      }
+    note: false
+    timertriggers: []
+    ignoreworker: false
+    skipunavailable: false
+    quietmode: 0
+    isoversize: false
+    isautoswitchedtoquietmode: false
+  "3":
+    id: "3"
+    taskid: 48ffe225-efcd-4e32-895b-5234affc689f
+    type: regular
+    task:
+      id: 48ffe225-efcd-4e32-895b-5234affc689f
+      version: -1
+      name: Delete Context
+      description: |-
+        Delete field from context.
+
+        This automation runs using the default Limited User role, unless you explicitly change the permissions.
+        For more information, see the section about permissions here:
+        https://docs-cortex.paloaltonetworks.com/r/Cortex-XSOAR/6.10/Cortex-XSOAR-Administrator-Guide/Automations
+      scriptName: DeleteContext
+      type: regular
+      iscommand: false
+      brand: ""
+    scriptarguments:
+      all:
+        simple: "yes"
+      subplaybook:
+        simple: "yes"
+    separatecontext: false
+    continueonerrortype: ""
+    view: |-
+      {
+        "position": {
+          "x": 650,
+          "y": 900
+        }
+      }
+    note: false
+    timertriggers: []
+    ignoreworker: false
+    skipunavailable: false
+    quietmode: 0
+    isoversize: false
+    isautoswitchedtoquietmode: false
+view: |-
+  {
+    "linkLabelsPosition": {},
+    "paper": {
+      "dimensions": {
+        "height": 615,
+        "width": 380,
+        "x": 650,
+        "y": 380
+      }
+    }
+  }
+inputs:
+- key: SNOWID
+  value: {}
+  required: false
+  description: ""
+  playbookInputQuery: null
+- key: XSIAMID
+  value: {}
+  required: false
+  description: ""
+  playbookInputQuery: null
+- key: entry
+  value: {}
+  required: false
+  description: ""
+  playbookInputQuery: null
+inputSections:
+- inputs:
+  - SNOWID
+  - XSIAMID
+  - entry
+  name: General (Inputs group)
+  description: Generic group for inputs
+outputSections:
+- outputs: []
+  name: General (Outputs group)
+  description: Generic group for outputs
+outputs: []
+quiet: true
+dirtyInputs: true

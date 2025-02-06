@@ -1,0 +1,286 @@
+id: 73f1257a-aba6-4e28-8928-2fb145caaa85
+version: 17
+vcShouldKeepItemLegacyProdMachine: false
+name: ServiceNow Sync XSIAM Work Notes
+starttaskid: "0"
+tasks:
+  "0":
+    id: "0"
+    taskid: 0f2596fd-b445-4444-8cff-5cb36032eb4b
+    type: start
+    task:
+      id: 0f2596fd-b445-4444-8cff-5cb36032eb4b
+      version: -1
+      name: ""
+      iscommand: false
+      brand: ""
+    nexttasks:
+      '#none#':
+      - "1"
+    separatecontext: false
+    continueonerrortype: ""
+    view: |-
+      {
+        "position": {
+          "x": 450,
+          "y": 50
+        }
+      }
+    note: false
+    timertriggers: []
+    ignoreworker: false
+    skipunavailable: false
+    quietmode: 0
+    isoversize: false
+    isautoswitchedtoquietmode: false
+  "1":
+    id: "1"
+    taskid: f1c5fc53-5b5c-47c8-80d4-b3dd187dc945
+    type: regular
+    task:
+      id: f1c5fc53-5b5c-47c8-80d4-b3dd187dc945
+      version: -1
+      name: Get WorkNotes Tagged with "snow"
+      description: send HTTP POST request.
+      script: '|||core-api-post'
+      type: regular
+      iscommand: true
+      brand: ""
+    nexttasks:
+      '#none#':
+      - "5"
+    scriptarguments:
+      body:
+        simple: '{"pageSize":100,"categories":[],"tags":["snow"],"usersAndOperator":false,"tagsAndOperator":false,"excludeScheduledEntries":true}'
+      extend-context:
+        simple: WorkNotes=.
+      uri:
+        simple: xsoar/investigation/INCIDENT-${inputs.Incident.incident_id}
+    separatecontext: false
+    continueonerrortype: ""
+    view: |-
+      {
+        "position": {
+          "x": 450,
+          "y": 200
+        }
+      }
+    note: false
+    timertriggers: []
+    ignoreworker: false
+    skipunavailable: false
+    quietmode: 0
+    isoversize: false
+    isautoswitchedtoquietmode: false
+  "2":
+    id: "2"
+    taskid: 3680ebdb-1037-47a3-8753-0043d8d2fc95
+    type: regular
+    task:
+      id: 3680ebdb-1037-47a3-8753-0043d8d2fc95
+      version: -1
+      name: Update SNOW Ticket worknotes
+      description: Updates the specified ticket.
+      script: '|||servicenow-update-ticket'
+      type: regular
+      iscommand: true
+      brand: ""
+    nexttasks:
+      '#none#':
+      - "3"
+    scriptarguments:
+      id:
+        simple: ${inputs.SNOWID}
+      work_notes:
+        simple: ${WorkNotes.response.entries.[0].contents}
+    separatecontext: false
+    continueonerrortype: ""
+    view: |-
+      {
+        "position": {
+          "x": 1060,
+          "y": 350
+        }
+      }
+    note: false
+    timertriggers: []
+    ignoreworker: false
+    skipunavailable: false
+    quietmode: 0
+    isoversize: false
+    isautoswitchedtoquietmode: false
+  "3":
+    id: "3"
+    taskid: 882aafb6-eeef-4d9e-815e-be265cb77eb5
+    type: regular
+    task:
+      id: 882aafb6-eeef-4d9e-815e-be265cb77eb5
+      version: -1
+      name: Update Warroom tags
+      description: send HTTP POST request.
+      script: '|||core-api-post'
+      type: regular
+      iscommand: true
+      brand: ""
+    scriptarguments:
+      body:
+        simple: '{"id":"${WorkNotes.response.entries.[0].id}","version":2,"investigationId":"INCIDENT-5601","tags":["processed"]}'
+      uri:
+        simple: /xsoar/entry/tags
+    separatecontext: false
+    continueonerrortype: ""
+    view: |-
+      {
+        "position": {
+          "x": 1090,
+          "y": 570
+        }
+      }
+    note: false
+    timertriggers: []
+    ignoreworker: false
+    skipunavailable: false
+    quietmode: 0
+    isoversize: false
+    isautoswitchedtoquietmode: false
+  "4":
+    id: "4"
+    taskid: 0963ba00-59b2-46f6-8165-aef04ed9a25f
+    type: playbook
+    task:
+      id: 0963ba00-59b2-46f6-8165-aef04ed9a25f
+      version: -1
+      name: SNOW - process xsiam warroom entries
+      playbookName: SNOW - process xsiam warroom entries
+      type: playbook
+      iscommand: false
+      brand: ""
+    nexttasks:
+      '#none#':
+      - "6"
+    scriptarguments:
+      SNOWID:
+        simple: ${inputs.Incident.custom_fields.servicenowticketid}
+      XSIAMID:
+        simple: INCIDENT-${inputs.Incident.incident_id}
+      entry:
+        simple: ${WorkNotes.response.entries}
+    separatecontext: true
+    continueonerrortype: ""
+    loop:
+      iscommand: false
+      exitCondition: ""
+      wait: 1
+      max: 0
+      forEach: true
+    view: |-
+      {
+        "position": {
+          "x": 450,
+          "y": 585
+        }
+      }
+    note: false
+    timertriggers: []
+    ignoreworker: false
+    skipunavailable: false
+    quietmode: 0
+    isoversize: false
+    isautoswitchedtoquietmode: false
+  "5":
+    id: "5"
+    taskid: 92ffa3c4-d020-4957-8126-2c45761bd824
+    type: condition
+    task:
+      id: 92ffa3c4-d020-4957-8126-2c45761bd824
+      version: -1
+      name: Are there worknotes?
+      type: condition
+      iscommand: false
+      brand: ""
+    nexttasks:
+      '#default#':
+      - "6"
+      "yes":
+      - "4"
+    separatecontext: false
+    conditions:
+    - label: "yes"
+      condition:
+      - - operator: isExists
+          left:
+            value:
+              simple: WorkNotes.response.entries
+            iscontext: true
+    continueonerrortype: ""
+    view: |-
+      {
+        "position": {
+          "x": 450,
+          "y": 370
+        }
+      }
+    note: false
+    timertriggers: []
+    ignoreworker: false
+    skipunavailable: false
+    quietmode: 0
+    isoversize: false
+    isautoswitchedtoquietmode: false
+  "6":
+    id: "6"
+    taskid: 5f5f9f6d-ce8e-4324-80ae-118c84512396
+    type: title
+    task:
+      id: 5f5f9f6d-ce8e-4324-80ae-118c84512396
+      version: -1
+      name: |
+        FIN
+      type: title
+      iscommand: false
+      brand: ""
+    separatecontext: false
+    continueonerrortype: ""
+    view: |-
+      {
+        "position": {
+          "x": 280,
+          "y": 830
+        }
+      }
+    note: false
+    timertriggers: []
+    ignoreworker: false
+    skipunavailable: false
+    quietmode: 0
+    isoversize: false
+    isautoswitchedtoquietmode: false
+view: |-
+  {
+    "linkLabelsPosition": {},
+    "paper": {
+      "dimensions": {
+        "height": 845,
+        "width": 1190,
+        "x": 280,
+        "y": 50
+      }
+    }
+  }
+inputs:
+- key: Incident
+  value: {}
+  required: false
+  description: The found incidents object
+  playbookInputQuery: null
+inputSections:
+- inputs:
+  - Incident
+  name: General (Inputs group)
+  description: Generic group for inputs
+outputSections:
+- outputs: []
+  name: General (Outputs group)
+  description: Generic group for outputs
+outputs: []
+dirtyInputs: true
